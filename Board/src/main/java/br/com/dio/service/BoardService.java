@@ -8,27 +8,25 @@ import lombok.AllArgsConstructor;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-
-
 @AllArgsConstructor
 public class BoardService {
 
     private final Connection connection;
 
-    public BoardEntity insert(final BoardEntity entity) throws SQLException{
+    public BoardEntity insert(final BoardEntity entity) throws SQLException {
         var dao = new BoardDAO(connection);
         var boardColumnDAO = new BoardColumnDAO(connection);
-        try {
+        try{
             dao.insert(entity);
-            var columns = entity.getBoardColumns().stream().map(c-> {
+            var columns = entity.getBoardColumns().stream().map(c -> {
                 c.setBoard(entity);
                 return c;
             }).toList();
-            for (var column : columns){
+            for (var column :  columns){
                 boardColumnDAO.insert(column);
             }
             connection.commit();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             connection.rollback();
             throw e;
         }
@@ -37,16 +35,17 @@ public class BoardService {
 
     public boolean delete(final Long id) throws SQLException {
         var dao = new BoardDAO(connection);
-        try {
-            if (!dao.exists(id)){
+        try{
+            if (!dao.exists(id)) {
                 return false;
             }
             dao.delete(id);
             connection.commit();
             return true;
-        } catch (SQLException e){
+        } catch (SQLException e) {
             connection.rollback();
             throw e;
         }
     }
+
 }
